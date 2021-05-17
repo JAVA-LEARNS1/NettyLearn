@@ -35,14 +35,15 @@ public class NIOSelector {
 		serverSocketChannel.configureBlocking(false);
 		
 		//打开Selector处理channel，即创建epoll(linux内核函数)
-		//相当epoll_create函数
+		//相当epoll_create函数的调用（相当于创建一个数据结构epoll实例）
 		Selector selector=Selector.open();
 		//把ServerSocketChannel注册到selector上，并且selector对客户端accept连接监视
-		//epoll_ctl
 		serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
 		while(true){
 			//阻塞等待处理的事件发生（连接事件SelectionKey.OP_ACCEPT）
-			//相当于epoll_wati函数
+			
+			//相当于epoll_ctl:轮询操作，为了让epoll 中的channel（serverSocketChannel）感知事件（SelectionKey.OP_ACCEPT）
+			//epoll_wati函数：监听事件集合（感知事件的集合），当没有事件时阻塞，有事件继续执行
 			selector.select();
 			//获取selector中注册的全部事件的SelectionKey 实例
 			Set<SelectionKey> selectionKeys=selector.selectedKeys();
