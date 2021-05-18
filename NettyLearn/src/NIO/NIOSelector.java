@@ -44,6 +44,16 @@ public class NIOSelector {
 			
 			//相当于epoll_ctl:轮询操作，为了让epoll 中的channel（serverSocketChannel）感知事件（SelectionKey.OP_ACCEPT）
 			//epoll_wati函数：监听事件集合（感知事件的集合），当没有事件时阻塞，有事件继续执行
+			
+			/**
+			 * NIO bug  epoll 空轮询：
+			 * 指的是当没有连接事件和读取事件发生时，selector.select()方法，解除了阻塞，
+			 * 这时selectionKeys为空，导致上面的while（true）一直循环，最后cpu 100%，这个就是epoll空轮询错误
+			 * 
+			 * 发生的原因：liunx操作系统的原因，
+			 * poll和epoll对于突然中断的连接，socket会对返回的eventSet事件集合置为POLLHUP也可能是POLLERR，eventSet
+			 * 事件集合发生变化，（select.select()发现了有事件），导致selector.select()被唤醒。
+			 */
 			selector.select();
 			//获取selector中注册的全部事件的SelectionKey 实例
 			Set<SelectionKey> selectionKeys=selector.selectedKeys();
