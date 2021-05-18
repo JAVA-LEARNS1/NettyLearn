@@ -6,8 +6,8 @@ NIO 非阻塞IO：客户端的连接不用等待，连接后存到list中，最�
 如果解决，采用多路复用器selector，
 
 selector是基于事件驱动的底层采用的是linux内核函数epoll_create,epoll_ctl,epoll_wait来实现的
-epoll_creat:会创建一个基于事件的文件（linux一切皆文件）
-epoll_ctl:会把事件注册到创建出来的epoll文件中
-epoll_wait:监视epoll文件是否被触发
+epoll_creat:会创建一个基于事件的文件句柄（int类型：epoll的位置，找到这个int就能找到epoll空间）（linux一切皆文件）
+epoll_ctl:控制epoll文件描述符上的事件，可以注册事件，修改事件，删除事件，在NIO中使用轮询来注册连接事件，读取事件，这些事件会通过系统的中断处理到eventSet集合中，下面的wait会监视我们的evnetSet集合。
+epoll_wait:监视eventSet集合，有的话停止阻塞
 
 这样,将我们的sock注册进selector同时监听连接事件，一旦客户端有连接，就会触发wait，之后遍历事件就可以了，这样就解决了上面的问题
