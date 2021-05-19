@@ -70,15 +70,30 @@ public class NIOSelector {
 					socketChannel.register(selector, SelectionKey.OP_READ);
 					System.out.print("客户端连接成功");
 				}else if(key.isReadable()) {//OP_READ 事件
-					SocketChannel socketChannel=(SocketChannel)key.channel();
-					ByteBuffer bytteBuffer =ByteBuffer.allocate(128);
-					int len=socketChannel.read(bytteBuffer);
-					if(len>0) {
-						System.out.print("接受到数据"+new String(bytteBuffer.array()));
-					}else if(len ==-1) {
-						System.out.print("客户端断开连接");
-						socketChannel.close();
+					/**
+					 * 使用try catch 不用throws 
+					 * 因为需要捕获异常来出来key
+					 * 如当客户断非正常停止时（点停止按键）
+					 * 此时服务端进入Read的方法会出异常，
+					 * 如果使用throws的话，这个key不会处理，导致selector认为key没有被处理
+					 * 不会阻塞 while(true)会一直执行
+					 * 所以加上try catch 来处理这个异常的key，让key cancel掉 这样selector会
+					 * 认为这个key被处理类，没有其他key的情况下会进入阻塞模式
+					 */
+					try {
+						SocketChannel socketChannel=(SocketChannel)key.channel();
+						ByteBuffer bytteBuffer =ByteBuffer.allocate(128);
+						int len=socketChannel.read(bytteBuffer);
+						if(len>0) {
+							System.out.print("接受到数据"+new String(bytteBuffer.array()));
+						}else if(len ==-1) {
+							System.out.print("客户端断开连接");
+							socketChannel.close();
+						}
+					} catch (Exception e) {
+						key.cancel();
 					}
+					
 				}
 				iterator.remove();
 			}
