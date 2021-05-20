@@ -13,10 +13,9 @@ epoll_creat:会创建一个基于事件的文件句柄（int类型：epoll的位
 
 相当于：Selector selector=Selector.open();
 
-epoll_ctl:控制epoll文件描述符上的事件，可以注册事件，修改事件，删除事件，在NIO中使用轮询来注册连接事件，
-读取事件，这些事件会通过系统的中断处理到eventSet集合中，下面的wait会监视我们的evnetSet集合。
+epoll_ctl:调用epoll_ctl向epoll对象中添加socket，由系统中断处理检查socket事件放到rdllist双向链表中
 
-epoll_wait:监视eventSet集合，集合有变化增加时，停止阻塞
+epoll_wait:监视rdllist，有增加时，停止阻塞
 
 相当于selector.select();
 
