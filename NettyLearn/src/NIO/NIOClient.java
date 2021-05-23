@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.Charset;
 
 public class NIOClient {
 
@@ -11,8 +12,8 @@ public class NIOClient {
 		try {
 			SocketChannel sc=SocketChannel.open();
 			sc.connect(new InetSocketAddress("localhost",9000));
-			SocketAddress address=sc.getLocalAddress();
-			System.out.print("watting:"+address);
+		sc.write(Charset.defaultCharset().encode("hello world 123456789"));
+			
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}

@@ -7,6 +7,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -82,10 +83,26 @@ public class NIOSelector {
 					 */
 					try {
 						SocketChannel socketChannel=(SocketChannel)key.channel();
-						ByteBuffer bytteBuffer =ByteBuffer.allocate(128);
-						int len=socketChannel.read(bytteBuffer);
+						//ByteBuffer byteBuffer =ByteBuffer.allocate(128);
+						ByteBuffer byteBuffer =ByteBuffer.allocate(10);
+						/**
+						//如果设置的缓存小于客户端传来的字节数  传来的是hello world 123456789 把缓存128-》10
+						 * 
+						 * 输出结果
+						 * hello worl
+						 * d 12345678
+						 * 9
+						 * 
+						 * 如何达到全部输出，
+						 * 1，客户端服务端规定传输长度
+						 * 2.分割符使用
+						 * 3，前4位是内容的长度，后面放内容
+						 */
+						int len=socketChannel.read(byteBuffer);
 						if(len>0) {
-							System.out.print("接受到数据"+new String(bytteBuffer.array()));
+							byteBuffer.flip();
+							System.out.println(Charset.defaultCharset().decode(byteBuffer));
+							
 						}else if(len ==-1) {
 							System.out.print("客户端断开连接");
 							socketChannel.close();
