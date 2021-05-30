@@ -17,7 +17,7 @@ public class HelloServer {
 
 	public static void main(String[] args) {
 		// 
-		EventLoopGroup group =new DefaultEventLoopGroup();//和NioEventLoopGroup,区别，Nio可以处理io事件，它只能处理普通事件，和定时事件
+		final EventLoopGroup group =new DefaultEventLoopGroup();//和NioEventLoopGroup,区别，Nio可以处理io事件，它只能处理普通事件，和定时事件
 		//1.启动器，负责组装netty组件，启动服务器
 		new ServerBootstrap()
 		//2.BossEventLoop,WorkerEventLoop(selector,thread),group组
@@ -47,6 +47,7 @@ public class HelloServer {
 							@Override
 							public void channelRead(ChannelHandlerContext ctx, Object msg){
 								System.out.println(msg);
+								ctx.fireChannelRead(msg);
 							}
 						}).addLast(group,"handle2",new ChannelInboundHandlerAdapter() {
 							@Override
